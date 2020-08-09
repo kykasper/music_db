@@ -1,0 +1,7 @@
+test*.m3u8
+config.py
+
+#meta data
+__pycache__/
+.ipynb_checkpoints/
+.vscode/
