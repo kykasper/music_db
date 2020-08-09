@@ -37,6 +37,7 @@ def getTagData(curdir, file):
     
     return res
 
+
 conn = sqlite3.connect('music.sqlite3')
 c = conn.cursor()
 # c.execute('create table songs(id integer, albumartist text, artist text, album text, songname text,  path text)')
