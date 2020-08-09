@@ -1,4 +1,7 @@
-test*.m3u8
+*.sqlite3
+*.sqlite3-journal
+*.db
+*.m3u8
 config.py
 
 #meta data
