@@ -26,5 +26,5 @@ if __name__ == '__main__':
 
     print(path)
     # filepath = r"C:\Users\Yuto\Documents\PythonScripts\getPlaylist\imas_songs.csv"
-    filepath = r"imas_songs.csv"
+    filepath = r"imas_radio_songs.csv"
     normalize_songs_table(filepath)

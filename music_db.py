@@ -75,16 +75,10 @@ class MusicDB():
         source_path = config.MUSIC_DIRECTORY
         for curdir, dirs, files in os.walk(source_path):
             for file in files:
-                # print(curdir, file)
-                # ext = file.rsplit(".", 1)[-1]
-                # source_filepath = os.path.join(curdir, file)
                 tags = getTagData(curdir, file)
                 if tags is None: continue
                 n_title = normalize_title.normalize(tags[3])
                 data = [id, *tags, n_title]
-                # for d in data:
-                #     print(d)
-                # print("="*20)
                 self.c.execute("INSERT INTO songs VALUES (?,?,?,?,?,?,?)", tuple(data) )
                 id+=1
         self.conn.commit()
@@ -93,10 +87,39 @@ class MusicDB():
     def update(self):
         pass
 
-    def make_playlist_by_title(self, name, title_list):
-        pass
+    def make_playlist_by_title(self, name, title_filepath):
+        print('make_playlist_by_title')
+        with open(title_filepath, encoding = 'UTF-8') as f:
+            title_list = list(f.read().splitlines())
 
-    def make_playlist_by_imas(self, name, title_list, cv_list):
+        # df = pd.DataFrame(columns=['artist', 'songname'])
+        df = pd.DataFrame(columns=['path'])
+        for title in title_list:
+            """
+            # que = 'SELECT artist,songname FROM songs WHERE normalized_songname = "onestep"'
+            que = 'SELECT artist,songname FROM songs WHERE normalized_songname = ?'
+            print(que)
+            print(title)
+            self.c.execute(que, (title, ))
+            result = self.c.fetchall()
+            for d in result:
+                print(d)
+            """
+            # que = 'SELECT artist,songname FROM songs WHERE normalized_songname = ? and album LIKE "%THE IDOLM@STER%"'
+            que = 'SELECT path FROM songs WHERE normalized_songname = ? and album LIKE "%THE IDOLM@STER%"'
+            res_df = pd.read_sql_query(que, self.conn, params=(title,))
+            print(res_df)
+            df = pd.concat([df, res_df])
+        df.to_csv(name, header=False, index=False, sep='\t')
+        print('end')
+
+    def make_playlist_by_imas(self, name, title_filepath, cv_filepath):
+        print('make_playlist_by_imas')
+        with open(title_filepath, encoding = 'UTF-8') as f:
+            title_list = list(f.read().splitlines())
+        cv_list = pd.read_csv(cv_filepath, encoding = 'UTF-8')
+
+        print('end')
         pass
 
     def make_playlist_by_que(self, name, que):
@@ -117,9 +140,11 @@ def main():
     db = MusicDB(db_path)
     name = 'test2.m3u8'
     # db.initialize()
-    # que = 'SELECT * FROM songs WHERE artist = "鈴木このみ"'
+    # que = 'SELECT normalized_songname FROM songs WHERE artist LIKE "%我那覇%"'
     # db.show_db_by_que(que)
     # db.make_playlist_by_que(name, que)
+    title_filepath = 'normal_imas_radio_songs.csv'
+    db.make_playlist_by_title(name, title_filepath)
     db.close()
 
 if __name__=='__main__':
