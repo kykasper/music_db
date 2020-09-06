@@ -152,9 +152,11 @@ class MusicDB():
         df.to_csv(name, header=False, index=False, sep='\t')
         print('end')
 
-    def make_playlist_by_que(self, name, que):
+    def make_playlist_by_que(self, name, que, ng_title):
         print('make_playlist_by_que')
         df = pd.read_sql_query(que, self.conn)
+        for ng in ng_title:
+            df.query(f'normalized_songname.str.match("^(?!.*{ng}).*$")', engine='python', inplace=True)
         df.to_csv(name, header=False, index=False)
         print('end')
 
@@ -168,12 +170,13 @@ class MusicDB():
 def main():
     db_path = 'music.sqlite3'
     db = MusicDB(db_path)
-    name = '765AS.m3u8'
+    name = '鈴木このみ.m3u8'
     # db.initialize()
-    db.count_db()
-    que = 'SELECT * FROM songs WHERE normalized_songname LIKE "%ストレトラブ!%" and albumartist = "THE IDOLM@STER 765PRO ALLSTARS"'
-    db.show_db_by_que(que)
-    # db.make_playlist_by_que(name, que)
+    # db.count_db()
+    que = 'SELECT * FROM songs WHERE artist LIKE "%鈴木このみ%" OR albumartist LIKE "%鈴木このみ%"'
+    # db.show_db_by_que(que)
+    ng_list = ["inst", "offvocal", "鈴木このみアニサマ10thsp", "bgm", "unveilzero"]
+    db.make_playlist_by_que(name, que, ng_list)
     
     title_filepath = 'normal_imas_songs.csv'
     cv_filepath = 'imas_CV.csv'
